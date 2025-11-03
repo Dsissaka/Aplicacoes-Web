@@ -17,13 +17,22 @@
   const opçõesInquilino = [
     { label: "Página Inicial", command: () => navegar("/pagina-inicial") },
     { label: "Menu", items: [
-      { label: "Cadastrar Morador Adicional", command: () => navegar("/atualizar-usuario"),
-        disabled: usuárioLogado.status !== "ativo"},
+      { label: "Cadastrar Morador Adicional", command: () => navegar("/atualizar-usuario"), disabled: usuárioLogado.status !== "ativo"},
       { label: "Cadastrar Inquilino", command: () => navegar("/cadastrar-inquilino")},
+      { label: "Administrar Propostas", command: () => navegar("/administrar-contratos-locacao")},
       { label: "Sair do Sistema", command: () => sairSistema()}
     ]},
   ];
-  const opçõesMoradorAdicional = [];
+ const opçõesMoradorAdicional = [
+    { label: "Página Inicial", command: () => navegar("/pagina-inicial") },
+    { label: "Menu", items: [
+      { label: "Cadastrar Usuário", command: () => navegar("/atualizar-usuario"),disabled: usuárioLogado.status !== "ativo"},
+      { label: "Cadastrar Morador Adicional", command: () => navegar("/cadastrar-morador-adicional")},
+      { label: "Administrar Interesses", command: () => navegar("/administrar-imoveis-aluguel")},
+      { label: "Sair do Sistema", command: () => sairSistema()},
+    ]},
+  ];
+
   function sairSistema() {
     setUsuárioLogado({});
     navegar("/");

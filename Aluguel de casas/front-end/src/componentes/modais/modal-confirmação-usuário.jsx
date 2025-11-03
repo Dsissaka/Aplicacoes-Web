@@ -5,28 +5,36 @@
  import ContextoUsuário from "../../contextos/contexto-usuário";
  import { estilizarBotão, estilizarBotãoRemover, estilizarDivCampo, estilizarInlineFlex, 
   estilizarLabel, estilizarModal } from "../../utilitários/estilos";
+ import { serviçoAlterarUsuário, serviçoRemoverUsuário } from "../../serviços/serviços-usuário";
+ import mostrarToast from "../../utilitários/mostrar-toast";
  export default function ModalConfirmaçãoUsuário() {
  const referênciaToast = useRef(null);
-  const { setUsuárioLogado, confirmaçãoUsuário, setConfirmaçãoUsuário, setMostrarModalConfirmação }
+  const { setUsuárioLogado, confirmaçãoUsuário, setConfirmaçãoUsuário, setMostrarModalConfirmação, usuárioLogado }
     = useContext(ContextoUsuário);
   const dados = { cpf: confirmaçãoUsuário?.cpf, perfil: confirmaçãoUsuário?.perfil,
     nome: confirmaçãoUsuário?.nome, senha: confirmaçãoUsuário?.senha,
     email: confirmaçãoUsuário?.email, questão: confirmaçãoUsuário?.questão,
     resposta: confirmaçãoUsuário?.resposta, cor_tema: confirmaçãoUsuário?.cor_tema };
-  const [redirecionar] = useState(false);
+  const [redirecionar, setRedirecionar] = useState(false);
   const navegar = useNavigate();
-  function labelOperação() {
+
+   function labelOperação() {
     switch (confirmaçãoUsuário?.operação) {
       case "salvar": return "Salvar";
+      case "alterar": return "Alterar";
+      case "remover": return "Remover";
       default: return;
     }
   };
-  function exibirPerfilFormatado() {
+
+   function exibirPerfilFormatado() {
     switch (dados.perfil) {
       case "inquilino": return "Inquilino";
+      case "morador_adicional": return "Morador Adicional";
       default: return "";
     }
   };
+
   function fecharToast() {
     if (redirecionar) {
       setMostrarModalConfirmação(false);
@@ -35,21 +43,50 @@
       navegar("../pagina-inicial");
     }
   };
-  function finalizarCadastro() {
+
+   function finalizarCadastro() {
     if (dados.perfil === "inquilino") {
       setUsuárioLogado({ ...dados, cadastrado: false });
       setMostrarModalConfirmação(false);
       navegar("../cadastrar-inquilino");
+    } else if (dados.perfil === "morador_adicional") {
+      setUsuárioLogado({ ...dados, cadastrado: false });
+      setMostrarModalConfirmação(false);
+      navegar("../cadastrar-morador-adicional");
     }
+  };
+  async function alterarUsuário(dadosAlterados) {
+    try {
+      const response = await serviçoAlterarUsuário({ ...dadosAlterados, cpf: usuárioLogado.cpf });
+      setUsuárioLogado({...usuárioLogado, ...response.data });
+      setRedirecionar(true);
+      mostrarToast(referênciaToast, "Alterado com sucesso! Redirecionando à Página Inicial...", 
+         "sucesso");
+    } catch (error) { mostrarToast(referênciaToast, error.response.data.erro, "erro"); }
+  };
+  async function removerUsuário() {
+    try {
+      await serviçoRemoverUsuário(usuárioLogado.cpf);
+      setRedirecionar(true);
+      mostrarToast(referênciaToast, "Removido com sucesso! Redirecionando ao Login.", "sucesso");
+    } catch (error) { mostrarToast(referênciaToast, error.response.data.erro, "erro"); }
   };
   function executarOperação() {
     switch (confirmaçãoUsuário.operação) {
       case "salvar":
         finalizarCadastro();
         break;
+      case "alterar":
+        alterarUsuário({ email: dados.email, senha: dados.senha, questão: dados.questão,
+          resposta: dados.resposta, cor_tema: dados.cor_tema });
+        break;
+      case "remover":
+        removerUsuário();
+        break;
       default: break;
     }
   };
+
   function ocultar() {
     if (!redirecionar) {
       setConfirmaçãoUsuário({});

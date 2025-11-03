@@ -1,4 +1,10 @@
  import servidor from "./servidor";
- export function serviçoCadastrarInquilino(inquilino)
-   { return servidor.post("/inquilinos", inquilino); };
+ export function serviçoCadastrarInquilino(inquilino){ return servidor.post("/inquilinos", inquilino); };
  export function serviçoBuscarInquilino(cpf) { return servidor.get(`/inquilinos/${cpf}`); };
+ export function serviçoAtualizarInquilino(inquilino) { return servidor.patch("/inquilinos", inquilino); };
+ export function serviçoCadastrarContratoLocação(proposta) { return servidor.post("/inquilinos/contratos", proposta); };
+ export function serviçoAlterarContratoLocação(proposta) {return servidor.patch("/inquilinos/contratos", proposta); };
+ export function serviçoRemoverContratoLocação(id) {return servidor.delete(`/inquilinos/contratos/${id}`); };
+ export function serviçoBuscarContratosLocaçãoInquilino(cpf) {return servidor.get(`/inquilinos/contratos/inquilino/${cpf}`); };
+ export function serviçoBuscarBairroContratos() {return servidor.get("/inquilinos/contratos/bairros"); };
+ export function serviçoBuscarImóveisAluguelContratoLocação(id_proposta) {return servidor.get(`/inquilinos/imoveis/${id_proposta}`); };

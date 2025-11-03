@@ -14,6 +14,7 @@ import ContextoUsuário from "../../contextos/contexto-usuário";
 import {
   serviçoCadastrarInquilino,
   serviçoBuscarInquilino,
+  serviçoAtualizarInquilino,
 } from "../../serviços/serviços-inquilino";
 import mostrarToast from "../../utilitários/mostrar-toast";
 import {
@@ -38,7 +39,7 @@ export default function CadastrarInquilino() {
   const referênciaToast = useRef(null);
   const { usuárioLogado, setUsuárioLogado } = useContext(ContextoUsuário);
   const [dados, setDados] = useState({
-    categoria: "",
+    tipo: "",
     tempo_alugando: "",
     fumante: false,
     profissão: "",
@@ -48,7 +49,7 @@ export default function CadastrarInquilino() {
   const [cpfExistente, setCpfExistente] = useState(false);
   const navegar = useNavigate();
 
-  const opçõesCategoria = [
+  const opçõesTipo = [
     { label: "Universitário", value: "universitário" },
     { label: "Não Universitário", value: "não_universitário" },
   ];
@@ -60,7 +61,7 @@ export default function CadastrarInquilino() {
   }
 
   function validarCampos() {
-    const camposObrigatórios = ["categoria", "tempo_alugando"];
+    const camposObrigatórios = ["tipo", "tempo_alugando"];
     const errosCamposObrigatórios = validarCamposObrigatórios(dados, camposObrigatórios);
     setErros(errosCamposObrigatórios);
     return checarListaVazia(errosCamposObrigatórios);
@@ -106,6 +107,24 @@ export default function CadastrarInquilino() {
       navegar("/pagina-inicial");
     }
   }
+  async function atualizarInquilino() {
+    if (validarCampos()) {
+      try {
+        const response = await serviçoAtualizarInquilino({ ...dados, cpf: usuárioLogado.cpf });
+        if (response) mostrarToast(referênciaToast, "Inquilino atualizado com sucesso!", "sucesso");
+      } catch (error) { mostrarToast(referênciaToast, error.response.data.erro, "erro"); }
+    }
+  };
+
+  function labelBotãoSalvar() {
+    if (usuárioLogado?.cadastrado) return "Alterar";
+    else return "Cadastrar";
+  };
+
+  function açãoBotãoSalvar() {
+    if (usuárioLogado?.cadastrado) atualizarInquilino();
+    else cadastrarInquilino();
+  };
 
   useEffect(() => {
     let desmontado = false;
@@ -116,7 +135,7 @@ export default function CadastrarInquilino() {
         if (!desmontado && response.data) {
           setDados((dados) => ({
             ...dados,
-            categoria: response.data.categoria,
+            tipo: response.data.tipo,
             tempo_alugando: response.data.tempo_alugando,
             fumante: response.data.fumante,
             profissão: response.data.profissão,
@@ -144,23 +163,23 @@ export default function CadastrarInquilino() {
     <div className={estilizarFlex()}>
       <Toast ref={referênciaToast} onHide={redirecionar} position="bottom-center" />
       <Card title={usuárioLogado?.cadastrado ? "Consultar Inquilino" : "Cadastrar Inquilino"} className={estilizarCard(usuárioLogado.cor_tema)}>
-        {/* Categoria */}
+        {/* Tipo */}
         <div className={estilizarDivCampo()}>
-          <label className={estilizarLabel(usuárioLogado.cor_tema)}>Categoria*:</label>
+          <label className={estilizarLabel(usuárioLogado.cor_tema)}>Tipo*:</label>
           <Dropdown
-            name="categoria"
-            className={estilizarDropdown(erros.categoria, usuárioLogado.cor_tema)}
-            value={dados.categoria}
-            options={opçõesCategoria}
+            name="tipo"
+            className={estilizarDropdown(erros.tipo, usuárioLogado.cor_tema)}
+            value={dados.tipo}
+            options={opçõesTipo}
             onChange={alterarEstado}
             placeholder="-- Selecione --"
           />
-          <MostrarMensagemErro mensagem={erros.categoria} />
+          <MostrarMensagemErro mensagem={erros.tipo} />
         </div>
 
         {/* Tempo alugando */}
         <div className={estilizarDivCampo()}>
-          <label className={estilizarLabel(usuárioLogado.cor_tema)}>Tempo alugando casas*:</label>
+          <label className={estilizarLabel(usuárioLogado.cor_tema)}>Tempo alugando casas (meses)*:</label>
           <InputNumber
             name="tempo_alugando"
             size={5}
@@ -210,7 +229,7 @@ export default function CadastrarInquilino() {
 
         <div className={estilizarInlineFlex()}>
           <Button className={estilizarBotãoRetornar()} label="Retornar" onClick={redirecionar} />
-          <Button className={estilizarBotão()} label={usuárioLogado?.cadastrado ? "Consultar" : "Cadastrar"} onClick={cadastrarInquilino} />
+          <Button className={estilizarBotão()} label={labelBotãoSalvar()} onClick={açãoBotãoSalvar}/>
         </div>
       </Card>
     </div>

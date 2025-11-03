@@ -2,27 +2,23 @@
 "typeorm";
  import MoradorAdicional from "./morador-adicional";
  import ContratoLocação from "./contrato-locação";
- export enum Categoria { CASA = "Casa", APARTAMENTO = "Apartamento" };
+ export enum Interesse { ALTO = "Alto", MÉDIO = "Médio", BAIXO = "Baixo", URGENTE = "Urgente" };
  @Entity()
  export default class ImóvelAluguel extends BaseEntity {
  @PrimaryGeneratedColumn()
  id: number;
- @Column({type: "enum", enum: Categoria })
- categoria: Categoria;
+ @Column({type: "enum", enum: Interesse })
+ nível_interesse: Interesse;
  @Column()
- aceita_pet: boolean;
+ tenho_pet: boolean;
  @Column()
  mobília_inclusa: boolean;
  @Column()
- valor: number;
+ valor_negociação: number;
  @Column()
- endereço: string;
- @Column()
- descrição_imóvel: string;
- @Column()
- número_quartos: number;
+ justificativa: string;
  @CreateDateColumn()
- disponível_desde: number;
+ interessado_desde: Date;
 
  
  @ManyToOne(() => ContratoLocação, (contrato) => contrato.imoveis, { onDelete: "CASCADE" })

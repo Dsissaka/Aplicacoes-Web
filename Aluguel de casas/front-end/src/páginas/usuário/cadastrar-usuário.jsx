@@ -16,7 +16,7 @@ import { useContext, useRef, useState } from "react";
  import { MostrarMensagemErro, checarListaVazia, validarCampoEmail, validarCamposObrigatórios,    
   validarConfirmaçãoSenha, validarConfirmaçãoSenhaOpcional, validarRecuperaçãoAcessoOpcional }
  from "../../utilitários/validações";
- import { TAMANHOS, TEMA_PADRÃO, estilizarBotão, estilizarCard, estilizarDialog, 
+ import { TAMANHOS, TEMA_PADRÃO, estilizarBotão, estilizarBotãoRemover, estilizarCard, estilizarDialog, 
   estilizarDivBotõesAção, estilizarDivCampo, estilizarDivider, estilizarDropdown, estilizarFlex, 
   estilizarFooterDialog, estilizarInputMask, estilizarInputText, estilizarLabel, estilizarLink, 
   estilizarPasswordInput, estilizarPasswordTextInputBorder, estilizarSubtítulo, opçõesCores }
@@ -74,7 +74,12 @@ import { useContext, useRef, useState } from "react";
   };
   function títuloFormulário() {
     if (!usuárioLogado?.perfil) return "Cadastrar Usuário";
-    else return "Consultar Usuário";
+    else return "Alterar Usuário";
+  };
+
+  function validarConfirmarAlteração () {
+      const camposVálidos = validarCampos();
+      if (camposVálidos) confirmarOperação("alterar");
   };
   function textoRetorno() {
     if (!usuárioLogado?.perfil) return "Retornar para login";
@@ -105,13 +110,17 @@ import { useContext, useRef, useState } from "react";
     setConfirmaçãoUsuário({ ...dados, operação });
     setMostrarModalConfirmação(true);
   };
-  function ComandosConfirmação() {
+function ComandosConfirmação() {
     if (!usuárioLogado?.perfil) {
       return <Button className={estilizarBotão(dados.cor_tema)} label="Salvar" 
         onClick={validarConfirmarCriação}/>;
     } else {
       return (
         <div className={estilizarDivBotõesAção()}>
+          <Button className={estilizarBotão(dados.cor_tema)} label="Alterar"
+             onClick={() => validarConfirmarAlteração()}/>
+          <Button className={estilizarBotãoRemover(dados.cor_tema)} label="Remover"
+             onClick={() => confirmarOperação("remover")}/>
         </div>
       );
     }

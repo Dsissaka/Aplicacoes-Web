@@ -62,7 +62,7 @@ import { useContext, useRef, useState } from "react";
         </div>
         <div className={estilizarFlex("center")}>
           <Button className={estilizarBotão()} label="Login" onClick={logarUsuário}/>
-          <Link className={estilizarLink()} to="/pagina-inicial">Recuperar Acesso de Usuário</Link>
+          <Link className={estilizarLink()} to="/recuperar-acesso">Recuperar Acesso de Usuário</Link>
           <Link className={estilizarLink()} to="/criar-usuario">Cadastrar Usuário</Link>
            </div>
       </Card>
